@@ -1,0 +1,30 @@
+{
+  "name": "pxtowhatever",
+  "version": "1.0.0",
+  "description": "根据 [pxtorem](https://github.com/cuth/postcss-pxtorem) 魔改，将 px 改为任意单位模式",
+  "main": "index.js",
+  "scripts": {
+    "dev":"cd example && node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/advence-liz/pxtowhatever.git"
+  },
+  "keywords": [
+    "px",
+    "postcss",
+    "postcss-plugin",
+    "pxtorem",
+    "pxtorpx",
+    "pxtowhatever"
+  ],
+  "author": "advence-liz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/advence-liz/pxtowhatever/issues"
+  },
+  "homepage": "https://github.com/advence-liz/pxtowhatever#readme",
+  "dependencies": {
+    "postcss": "^7.0.14"
+  }
+}
