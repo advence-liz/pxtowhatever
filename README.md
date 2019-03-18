@@ -84,7 +84,7 @@ const css = fs.readFileSync(path.join(__dirname, "main.css"), "utf8")
   font-size: 14rpx;
   line-height: 20rpx;
   margin: -10rpx 0.5em;
-  padding: 5rem 0.5rpx;
+  padding: 10rpx 10rpx;
   border: 2rpx solid black;
 }
 
@@ -92,7 +92,7 @@ const css = fs.readFileSync(path.join(__dirname, "main.css"), "utf8")
   font-size: 28rpx;
   line-height: 40rpx;
   margin: -20rpx 0.5em;
-  padding: 5rem 1rpx;
+  padding: 20rpx 20rpx;
   border: 4rpx solid black;
 }
 
@@ -100,7 +100,7 @@ const css = fs.readFileSync(path.join(__dirname, "main.css"), "utf8")
   font-size: 28rpx;
   line-height: 40rpx;
   margin: -20rpx 0.5em;
-  padding: 5rem 1rpx;
+  padding: 20rpx 20rpx;
   border: 4rpx solid black;
 }
 
@@ -108,7 +108,7 @@ const css = fs.readFileSync(path.join(__dirname, "main.css"), "utf8")
   font-size: 7rpx;
   line-height: 10rpx;
   margin: -5rpx 0.5em;
-  padding: 5rem 0.25rpx;
+  padding: 5rpx 5rpx;
   border: 1rpx solid black;
 }
 ```
