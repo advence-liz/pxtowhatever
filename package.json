@@ -1,6 +1,6 @@
 {
   "name": "pxtowhatever",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "根据 [pxtorem](https://github.com/cuth/postcss-pxtorem) 魔改，将 px 改为任意单位模式",
   "main": "index.js",
   "scripts": {
