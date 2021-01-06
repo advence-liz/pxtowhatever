@@ -1,29 +1,32 @@
-"use strict"
+'use strict'
 
-const postcss = require("postcss")
-const pxRegex = require("./lib/pixel-unit-regex")
-const filterPropList = require("./lib/filter-prop-list")
+const postcss = require('postcss')
+const pxRegex = require('./lib/pixel-unit-regex')
+const filterPropList = require('./lib/filter-prop-list')
+const type = require('./lib/type')
 
 const defaults = {
   unitPrecision: 5,
-  unit: "rpx",
+  unit: 'rpx',
   selectorBlackList: [],
-  propList: ["font", "font-size", "line-height", "letter-spacing"],
+  propList: ['font', 'font-size', 'line-height', 'letter-spacing'],
   replace: true,
   mediaQuery: false,
-  minPixelValue: 0
+  minPixelValue: 0,
+  exclude: null,
+  include: null
 }
 
 const legacyOptions = {
-  unit_precision: "unitPrecision",
-  selector_black_list: "selectorBlackList",
-  prop_white_list: "propList",
-  media_query: "mediaQuery",
-  propWhiteList: "propList"
+  unit_precision: 'unitPrecision',
+  selector_black_list: 'selectorBlackList',
+  prop_white_list: 'propList',
+  media_query: 'mediaQuery',
+  propWhiteList: 'propList'
 }
 const unitPattern = /(^[\*/])?(\d+)?(\S+)/
 
-module.exports = postcss.plugin("postcss-pxtorpx", function(options) {
+module.exports = postcss.plugin('postcss-pxtorpx', function (options) {
   if (!unitPattern.test(options.unit)) {
     console.error(`unit格式不符合要求
     目前支持如下形式:<operator><multiplier>[suffix]
@@ -37,18 +40,33 @@ module.exports = postcss.plugin("postcss-pxtorpx", function(options) {
   convertLegacyOptions(options)
   const opts = { ...defaults, ...options }
 
-  const pxReplace = createPxReplace(
-    opts.unitPrecision,
-    opts.minPixelValue,
-    opts.unit
-  )
+  const pxReplace = createPxReplace(opts.unitPrecision, opts.minPixelValue, opts.unit)
 
   const satisfyPropList = createPropListMatcher(opts.propList)
 
-  return function(css) {
-    css.walkDecls(function(decl, i) {
+  return function (css) {
+    const filePath = css.source.input.file
+    const exclude = opts.exclude
+    if (
+      exclude &&
+      ((type.isFunction(exclude) && exclude(filePath)) ||
+        (type.isString(exclude) && filePath.indexOf(exclude) !== -1) ||
+        filePath.match(exclude) !== null)
+    ) {
+      return
+    }
+    const include = opts.include
+    if (
+      include &&
+      ((type.isFunction(include) && !include(filePath)) ||
+        (type.isString(include) && filePath.indexOf(include) === -1) ||
+        filePath.match(include) === null)
+    ) {
+      return
+    }
+    css.walkDecls(function (decl, i) {
       // This should be the fastest test and will remove most declarations
-      if (decl.value.indexOf("px") === -1) {
+      if (decl.value.indexOf('px') === -1) {
         return
       }
 
@@ -80,8 +98,8 @@ module.exports = postcss.plugin("postcss-pxtorpx", function(options) {
     })
 
     if (opts.mediaQuery) {
-      css.walkAtRules("media", function(rule) {
-        if (rule.params.indexOf("px") === -1) {
+      css.walkAtRules('media', function (rule) {
+        if (rule.params.indexOf('px') === -1) {
           return
         }
         rule.params = rule.params.replace(pxRegex, pxReplace)
@@ -91,21 +109,19 @@ module.exports = postcss.plugin("postcss-pxtorpx", function(options) {
 })
 
 function convertLegacyOptions(options) {
-  if (typeof options !== "object") {
+  if (typeof options !== 'object') {
     return
   }
   if (
-    ((typeof options["prop_white_list"] !== "undefined" &&
-      options["prop_white_list"].length === 0) ||
-      (typeof options.propWhiteList !== "undefined" &&
-        options.propWhiteList.length === 0)) &&
-    typeof options.propList === "undefined"
+    ((typeof options['prop_white_list'] !== 'undefined' && options['prop_white_list'].length === 0) ||
+      (typeof options.propWhiteList !== 'undefined' && options.propWhiteList.length === 0)) &&
+    typeof options.propList === 'undefined'
   ) {
-    options.propList = ["*"]
-    delete options["prop_white_list"]
+    options.propList = ['*']
+    delete options['prop_white_list']
     delete options.propWhiteList
   }
-  Object.keys(legacyOptions).forEach(function(key) {
+  Object.keys(legacyOptions).forEach(function (key) {
     if (options.hasOwnProperty(key)) {
       options[legacyOptions[key]] = options[key]
       delete options[key]
@@ -114,7 +130,7 @@ function convertLegacyOptions(options) {
 }
 
 function createPxReplace(unitPrecision, minPixelValue, unit) {
-  return function(m, $1) {
+  return function (m, $1) {
     if (!$1) {
       return m
     }
@@ -123,12 +139,10 @@ function createPxReplace(unitPrecision, minPixelValue, unit) {
       return m
     }
 
-    const [match, operator = "*", multiplier = 1, suffix] = unit.match(
-      unitPattern
-    )
-    const num = operator === "*" ? pixels * multiplier : pixels / multiplier
+    const [match, operator = '*', multiplier = 1, suffix] = unit.match(unitPattern)
+    const num = operator === '*' ? pixels * multiplier : pixels / multiplier
     const fixedVal = toFixed(num, unitPrecision)
-    return fixedVal === 0 ? "0" : fixedVal + suffix
+    return fixedVal === 0 ? '0' : fixedVal + suffix
   }
 }
 // 下面的 multiplier 跟参数 multiplier 完全没有关系
@@ -139,17 +153,17 @@ function toFixed(number, precision) {
 }
 
 function declarationExists(decls, prop, value) {
-  return decls.some(function(decl) {
+  return decls.some(function (decl) {
     return decl.prop === prop && decl.value === value
   })
 }
 
 function blacklistedSelector(blacklist, selector) {
-  if (typeof selector !== "string") {
+  if (typeof selector !== 'string') {
     return
   }
-  return blacklist.some(function(regex) {
-    if (typeof regex === "string") {
+  return blacklist.some(function (regex) {
+    if (typeof regex === 'string') {
       return selector.indexOf(regex) !== -1
     }
     return selector.match(regex)
@@ -157,7 +171,7 @@ function blacklistedSelector(blacklist, selector) {
 }
 
 function createPropListMatcher(propList) {
-  const hasWild = propList.indexOf("*") > -1
+  const hasWild = propList.indexOf('*') > -1
   const matchAll = hasWild && propList.length === 1
   const lists = {
     exact: filterPropList.exact(propList),
@@ -169,31 +183,31 @@ function createPropListMatcher(propList) {
     notStartWith: filterPropList.notStartWith(propList),
     notEndWith: filterPropList.notEndWith(propList)
   }
-  return function(prop) {
+  return function (prop) {
     if (matchAll) {
       return true
     }
     return (
       (hasWild ||
         lists.exact.indexOf(prop) > -1 ||
-        lists.contain.some(function(m) {
+        lists.contain.some(function (m) {
           return prop.indexOf(m) > -1
         }) ||
-        lists.startWith.some(function(m) {
+        lists.startWith.some(function (m) {
           return prop.indexOf(m) === 0
         }) ||
-        lists.endWith.some(function(m) {
+        lists.endWith.some(function (m) {
           return prop.indexOf(m) === prop.length - m.length
         })) &&
       !(
         lists.notExact.indexOf(prop) > -1 ||
-        lists.notContain.some(function(m) {
+        lists.notContain.some(function (m) {
           return prop.indexOf(m) > -1
         }) ||
-        lists.notStartWith.some(function(m) {
+        lists.notStartWith.some(function (m) {
           return prop.indexOf(m) === 0
         }) ||
-        lists.notEndWith.some(function(m) {
+        lists.notEndWith.some(function (m) {
           return prop.indexOf(m) === prop.length - m.length
         })
       )
