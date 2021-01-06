@@ -1,13 +1,11 @@
 # pxtowhatever
 
 根据 [pxtorem](https://github.com/cuth/postcss-pxtorem) 魔改，将 px 改为任意单位模式
-
 ## 安装
 
 ```bash
 $ npm i pxtowhatever
 ```
-
 ## 使用方法
 
 在`pxtorem`的基础上去掉了`rootValue`添加`unit`参数
