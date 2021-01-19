@@ -6,21 +6,6 @@
 ```bash
 $ npm i pxtowhatever
 ```
-## 使用方法
-
-在`pxtorem`的基础上去掉了`rootValue`添加`unit`参数
-
-### `unit`的形式为`<operator><multiplier>[suffix]` 
-
-举个例子:`*2rpx` 其中 `*`->`<operator>` `2`->`<multiplier>` `rpx`->`[suffix]`
-其中 operator，multiplier 选填 suffix 必填即目前支持以下四种模式
-
-- `rpx`
-- `2rpx`
-- `*2rpx`
-- `/2rpx` 当使用 `pxtorem`的时候设置`rootValue`=16 就相当与设置 `unit`=`/16rem`
-
-
 ### options
 
 更多配置copy[pxtorem](https://github.com/cuth/postcss-pxtorem)
@@ -40,7 +25,12 @@ Default:
 }
 ```
 
-- `rootValue` (Number | Function) Represents the root element font size or returns the root element font size based on the [`input`](https://api.postcss.org/Input.html) parameter
+- `unit` 模式为`<operator><multiplier>[suffix]`举个例子:`*2rpx` 其中 `*`->`<operator>` `2`->`<multiplier>` `rpx`->`[suffix]`
+其中 operator，multiplier 选填 suffix 必填即目前支持以下四种模式
+  - `rpx`
+  - `2rpx`
+  - `*2rpx`
+  - `/2rpx` 当使用 `pxtorem`的时候设置`rootValue`=16 就相当与设置 `unit`=`/16rem`
 - `unitPrecision` (Number) The decimal numbers to allow the REM units to grow to.
 - `propList` (Array) The properties that can change from px to rem.
     - Values need to be exact matches.
@@ -64,7 +54,7 @@ Default:
     - If value is function, you can use exclude function to return a true and the file will be ignored.
         - the callback will pass the file path as  a parameter, it should returns a Boolean result.
         - `function (file) { return file.indexOf('exclude') !== -1; }`
-- `include` (String, Regexp, Function) The file path to include. 
+- `include` (String, Regexp, Function) The file path to include. 参数形式跟 exclude 相同.
 ## example
 
 假设你有如下文件 `main.css` `index.js` 其输出结果将跟下面一致
@@ -155,20 +145,6 @@ const css = fs.readFileSync(path.join(__dirname, "main.css"), "utf8")
 ```
 ## webpack demo
 ```js
-const pxtoremSettings = remUnit =>
-  pxtowhatever({
-    unit: "/2px",
-    propList: [
-      "*",
-      "!letter-spacing",
-      "!border",
-      "!border-top",
-      "!border-left",
-      "!border-right",
-      "!border-bottom"
-    ],
-    minPixelValue: 1
-  });
 
  rules: [
 
@@ -180,7 +156,19 @@ const pxtoremSettings = remUnit =>
           {
             loader: "postcss-loader",
             options: {
-              plugins: [pxtoremSettings()]
+              plugins: [ pxtowhatever({
+                        unit: "/2px",
+                        propList: [
+                          "*",
+                          "!letter-spacing",
+                          "!border",
+                          "!border-top",
+                          "!border-left",
+                          "!border-right",
+                          "!border-bottom"
+                        ],
+                        minPixelValue: 1
+                      });]
             }
           },
 
