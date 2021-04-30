@@ -1,6 +1,6 @@
 # pxtowhatever
 
-根据 [pxtorem](https://github.com/cuth/postcss-pxtorem) 魔改，将 px 改为任意单位模式
+根据 [pxtorem](https://github.com/cuth/postcss-pxtorem) 魔改，将 px 改为任意单位模式，如 rpx, rem ,vw
 ## 安装
 
 ```bash
@@ -8,7 +8,6 @@ $ npm i pxtowhatever
 ```
 ### options
 
-更多配置copy[pxtorem](https://github.com/cuth/postcss-pxtorem)
 
 Type: `Object | Null`  
 Default:
