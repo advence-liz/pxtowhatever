@@ -13,7 +13,7 @@ Type: `Object | Null`
 Default:
 ```js
 {
-    rootValue: 16,
+    unit: "*2rpx",
     unitPrecision: 5,
     propList: ['font', 'font-size', 'line-height', 'letter-spacing'],
     selectorBlackList: [],
